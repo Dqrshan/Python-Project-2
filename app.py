@@ -1,24 +1,16 @@
 import tkinter as T
 import mysql.connector as mysql
-import tkinter.messagebox as err
+import tkinter.messagebox as box
 from tkinter import ttk
 
-# predefined user functions import
-# from src.add import add
-
-# main
-fonts = {
-    'head': ('Arial', 15, 'bold'),
-    'label': ('Garamond', 14),
-    'entry': ('Garamond', 12)
-}
-
-colors = {
-    'left': '#b3b3cc',
-    'center': '#c2c2d6',
-    'head': '#6699ff',
-    'right': 'Gray'
-}
+# pre defined fns import
+from src.add import add
+from src.delete import delete
+from src.display import display
+from src.modify import modify
+from src.reset import reset
+from src.bill import bill
+from config import fonts, colors
 
 connection = mysql.connect(
     user='root', passwd='Darshan@101', database='chad', host='localhost')
@@ -31,111 +23,39 @@ app.title('Shop Management System')
 app.geometry('1000x600')
 app.resizable(False, False)
 
-cursor.execute('SELECT * FROM Shop')
-cursor.fetchall()
-total = cursor.rowcount
-
 id = T.IntVar(app)
 name = T.StringVar(app)
 price = T.IntVar(app)
-id.set(total + 1)
-
-
-def reset():
-    for i in ['id', 'name', 'price']:
-        exec(f'{i}.set("")')
-
-
-def display():
-    global Tree
-    Tree.delete(*Tree.get_children())
+def refresh():
     cursor.execute('SELECT * FROM Shop')
-    res = cursor.fetchall()
-    for rec in res:
-        Tree.insert('', T.END, values=rec)
+    cursor.fetchall()
+    total = cursor.rowcount
+    return id.set(total + 1)
 
-
-def add():
-    xid = id.get()
-    xname = name.get()
-    xprice = price.get()
-    if not xid or not xname or not xprice:
-        err.showerror('Error', 'Missing (Empty) Fields')
-    else:
-        try:
-            cursor.execute(
-                f'INSERT INTO Shop VALUES ({xid}, "{xname}", {xprice})')
-            connection.commit()
-            err.showinfo('Success', f'Added Record (ID: {xid})')
-            display()
-            reset()
-        except:
-            err.showerror('Error', 'Given values have an invalid type')
-
-
-def delete():
+def Add():
     global Tree
-    if not Tree.selection():
-        err.showerror('Error', 'Please select a record to delete')
-    else:
-        rec = Tree.focus()
-        values = Tree.item(rec)
-        select = values['values']
-        Tree.delete(rec)
-        cursor.execute(f'DELETE FROM Shop WHERE Item_ID={select[0]}')
-        connection.commit()
-        err.showinfo('Success', f'Deleted Record with ID = {select[0]}')
-        display()
+    add(cursor, connection, id, name, price, box, Tree)
+    refresh()
 
 
-def openMod():
+def Delete():
     global Tree
-    rec = Tree.focus()
-    if not rec:
-        err.showerror(
-            'Error', 'Please select a value from the tree to modify!')
-        return
-    mod = T.Tk()
-    mod.geometry('400x250')
-    mod.resizable(False, False)
-    item = Tree.item(rec)
-    val = item['values']
-    mod.title(f'Modifying item: "{val[1]}"')
-    mname = T.StringVar(mod)
-    mprice = T.IntVar(mod)
-    mname.set(val[1])
-    mprice.set(int(val[2]))
+    delete(cursor, connection, box, Tree)
+    refresh()
 
-    def modify():
-        yname = mname.get()
-        yprice = mprice.get()
-        if not yname or not yprice:
-            err.showerror('Error', 'Please enter values')
-            return
-        try:
-            cursor.execute(f'DELETE FROM Shop WHERE Item_Id = {val[0]}')
-            connection.commit()
-            cursor.execute(
-                f'INSERT INTO Shop VALUES ({val[0]}, "{yname}", {yprice})')
-            connection.commit()
-            err.showinfo('Success!', f'Modified Record with ID: {val[0]}')
-            display()
-            mod.destroy()
-        except:
-            err.showerror('Error', 'An unknown error occurred!')
-            mod.destroy()
-    T.Label(mod, text='New Name:', font=fonts['label']).pack(padx=10, pady=10)
-    T.Entry(mod, width=20, textvariable=mname,
-            font=fonts['entry']).pack(padx=10, pady=10)
 
-    T.Label(mod, text='New Price:', font=fonts['label']).pack(padx=10, pady=10)
-    T.Entry(mod, width=20, textvariable=mprice,
-            font=fonts['entry']).pack(padx=10, pady=10)
+def Modify():
+    global Tree
+    modify(cursor, connection, box, Tree)
+    refresh()
 
-    T.Button(mod, text='Submit', font=fonts['label'], bg='green', command=modify, width=20).pack(
-        padx=10, pady=10)
-    mod.update()
-    mod.mainloop()
+
+def Reset():
+    reset(id, name, price)
+    refresh()
+
+def Bill():
+    bill(cursor)
 
 
 T.Label(app, text='Welcome to Shop Management System!',
@@ -165,15 +85,15 @@ T.Entry(LFrame, width=19, textvariable=price,
         font=fonts['entry']).pack(padx=10, pady=10)
 
 T.Button(LFrame, text='Reset',
-         font=fonts['label'], command=reset).pack(padx=10, pady=10, fill=T.X)
+         font=fonts['label'], command=Reset).pack(padx=10, pady=10, fill=T.X)
 
 T.Button(CFrame, text='Add',
-         font=fonts['label'], command=add).pack(padx=10, pady=10, fill=T.X)
+         font=fonts['label'], command=Add).pack(padx=10, pady=10, fill=T.X)
 T.Button(CFrame, text='Delete',
-         font=fonts['label'], command=delete).pack(padx=10, pady=10, fill=T.X)
+         font=fonts['label'], command=Delete).pack(padx=10, pady=10, fill=T.X)
 T.Button(CFrame, text='Modify',
-         font=fonts['label'], command=openMod).pack(padx=10, pady=10, fill=T.X)
-T.Button(CFrame, text='Generate Bill',
+         font=fonts['label'], command=Modify).pack(padx=10, pady=10, fill=T.X)
+T.Button(CFrame, text='Generate Bill', command=Bill,
          font=fonts['label'], ).pack(padx=10, pady=10, fill=T.X)
 
 T.Label(RFrame, text='Shop Database',
@@ -198,6 +118,8 @@ Tree.column('#2', width=200, stretch=T.NO)
 
 Tree.place(y=30, relwidth=1, relheight=0.9, relx=0)
 
-display()
+refresh()
+display(cursor, Tree)
+
 app.update()
 app.mainloop()
