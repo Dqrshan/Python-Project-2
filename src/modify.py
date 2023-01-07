@@ -8,8 +8,8 @@ from src.display import display
 def modify(cursor, connection, box, Tree: ttk.Treeview):
     rec = Tree.focus()
     if not rec:
-        box.showerror(
-            'Error', 'Please select a value from the tree to modify!')
+        box.showwarning(
+            'Warning!', 'Please select a record from the tree to modify!')
         return
     mod = T.Tk()
     mod.geometry('400x250')
@@ -21,11 +21,12 @@ def modify(cursor, connection, box, Tree: ttk.Treeview):
     mprice = T.IntVar(mod)
     mname.set(val[1])
     mprice.set(int(val[2]))
+
     def Mod():
         yname = mname.get()
         yprice = mprice.get()
         if not yname or not yprice:
-            box.showerror('Error', 'Please enter values')
+            box.showarning('Warning!', 'Please enter values')
             return
         try:
             cursor.execute(f'DELETE FROM Shop WHERE Item_Id = {val[0]}')
@@ -37,8 +38,8 @@ def modify(cursor, connection, box, Tree: ttk.Treeview):
             display(cursor, Tree)
             return mod.destroy()
         except:
-            box.showerror('Error', 'An unknown error occurred!')
-            return mod.destroy()    
+            box.showerror('Error!', 'An unknown error occurred!')
+            return mod.destroy()
     T.Label(mod, text='New Name:', font=fonts['label']).pack(padx=10, pady=10)
     T.Entry(mod, width=20, textvariable=mname,
             font=fonts['entry']).pack(padx=10, pady=10)

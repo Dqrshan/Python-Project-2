@@ -13,7 +13,7 @@ from src.bill import bill
 from config import fonts, colors
 
 connection = mysql.connect(
-    user='root', passwd='Darshan@101', database='chad', host='localhost')
+    user='root', passwd='', database='myfirstdb', host='localhost')
 cursor = connection.cursor()
 cursor.execute(
     'CREATE TABLE IF NOT EXISTS Shop (Item_ID INT PRIMARY KEY NOT NULL, Item_Name VARCHAR(64), Price INT)')

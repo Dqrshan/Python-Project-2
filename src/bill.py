@@ -22,4 +22,4 @@ def bill(cursor):
     writer.writerow(['Total:', '', str(total)])
     file.close()
     box.showinfo('Bill Generated!',
-                 f'Successfully generated bill!\n\tDate: {date[0]}\n\tTime: {traw[0]}\n\nPlease check the "bills" folder!')
+                 f'Successfully generated bill!\n>> Date: {date[0]}\n>> Time: {traw[0]}\n\nPlease check the "bills" folder!')

@@ -1,7 +1,7 @@
 fonts = {
     'head': ('Arial', 15, 'bold'),
-    'label': ('Garamond', 14),
-    'entry': ('Garamond', 12)
+    'label': ('Arial', 14),
+    'entry': ('Arial', 12)
 }
 
 colors = {
