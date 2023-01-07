@@ -26,11 +26,14 @@ app.resizable(False, False)
 id = T.IntVar(app)
 name = T.StringVar(app)
 price = T.IntVar(app)
+
+
 def refresh():
     cursor.execute('SELECT * FROM Shop')
     cursor.fetchall()
     total = cursor.rowcount
     return id.set(total + 1)
+
 
 def Add():
     global Tree
@@ -53,6 +56,7 @@ def Modify():
 def Reset():
     reset(id, name, price)
     refresh()
+
 
 def Bill():
     bill(cursor)
